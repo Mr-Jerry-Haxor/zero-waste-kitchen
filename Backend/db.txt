@@ -1,0 +1,57 @@
+
+
+
+
+
+Here's a step-by-step guide to install PostgreSQL on Ubuntu Server and configure it for remote connections from your Go backend project.
+
+1. Install PostgreSQL
+bash
+Copy
+# Update package lists
+sudo apt update
+
+# Install PostgreSQL
+sudo apt install postgresql postgresql-contrib
+2. Configure PostgreSQL for Remote Connections
+Edit the PostgreSQL configuration files:
+bash
+Copy
+# Edit the main configuration file
+sudo nano /etc/postgresql/<version>/main/postgresql.conf
+Replace <version> with your PostgreSQL version (e.g., 14, 15, etc.)
+
+Find the line that says:
+
+Copy
+#listen_addresses = 'localhost'
+and change it to:
+
+Copy
+listen_addresses = '*'
+Edit the pg_hba.conf file:
+bash
+Copy
+sudo nano /etc/postgresql/<version>/main/pg_hba.conf
+Add this line at the end of the file to allow connections from your network (replace IP with your server's IP or network range):
+
+Copy
+host    all             all             0.0.0.0/0               md5
+For more security, you can restrict to specific IPs:
+
+Copy
+host    all             all             <your-ip>/32            md5
+3. Set Up PostgreSQL User and Database
+Connect to PostgreSQL:
+
+bash
+Copy
+sudo -u postgres psql
+Create a database and user for your Go project:
+
+
+
+CREATE DATABASE zero_waste_kitchen;
+CREATE USER zeo_kitchen_user WITH ENCRYPTED PASSWORD 'Password@123$';
+GRANT ALL PRIVILEGES ON DATABASE zero_waste_kitchen TO zeo_kitchen_user;
+ALTER DATABASE zero_waste_kitchen OWNER TO zeo_kitchen_user;
