@@ -1,0 +1,30 @@
+<div class="receipt-detail-container">
+    <button mat-button (click)="router.navigate(['/receipts'])">← Back to Receipts</button>
+    
+    <div *ngIf="loading" class="loading">Loading receipt...</div>
+    
+    <div *ngIf="error" class="error-message">{{ error }}</div>
+    
+    <div *ngIf="receipt && !loading" class="receipt-detail">
+      <div class="receipt-header">
+        <h1>{{ receipt.storeName || 'Unknown Store' }}</h1>
+        <div class="receipt-meta">
+          <span>{{ receipt.createdAt | date }}</span>
+          <span>{{ receipt.items?.length || 0 }} items</span>
+        </div>
+      </div>
+      
+      <div class="receipt-image" *ngIf="receipt.imagePath">
+        <img [src]="receipt.imagePath" alt="Receipt image">
+      </div>
+      
+      <div class="items-list">
+        <h2>Items</h2>
+        <div *ngFor="let item of receipt.items" class="item-row">
+          <span class="item-name">{{ item.name }}</span>
+          <span class="item-quantity">{{ item.quantity }} {{ item.unit }}</span>
+          <span class="item-price" *ngIf="item.price">${{ item.price | number:'1.2-2' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>

@@ -1,0 +1,35 @@
+<div class="grocery-container">
+    <div class="grocery-header">
+      <h1>My Groceries</h1>
+      <div class="search-bar">
+        <input 
+          type="text" 
+          [(ngModel)]="searchTerm" 
+          (input)="filterGroceries()"
+          placeholder="Search groceries...">
+        <button routerLink="/groceries/new" class="btn-primary">Add New</button>
+      </div>
+    </div>
+  
+    <div *ngIf="loading" class="loading">Loading...</div>
+  
+    <div *ngIf="!loading && filteredGroceries.length === 0" class="empty-state">
+      <p>No groceries found. Add some items to get started!</p>
+      <button routerLink="/groceries/new" class="btn-primary">Add First Item</button>
+    </div>
+  
+    <div class="grocery-grid">
+      <div *ngFor="let grocery of filteredGroceries" class="grocery-card">
+        <div class="grocery-info">
+          <h3>{{ grocery.name }}</h3>
+          <p>{{ grocery.quantity }} {{ grocery.unit }}</p>
+          <p>Expires: {{ grocery.expiryDate | date }}</p>
+          <p>Location: {{ grocery.storageLocation }}</p>
+        </div>
+        <div class="grocery-actions">
+          <button (click)="viewDetails(grocery.id)" class="btn-secondary">Details</button>
+          <button (click)="deleteGrocery(grocery.id)" class="btn-danger">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>

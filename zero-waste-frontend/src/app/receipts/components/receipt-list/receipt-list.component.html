@@ -1,0 +1,34 @@
+<div class="receipt-container">
+    <div class="receipt-header">
+      <h1>My Receipts</h1>
+      <button mat-raised-button color="primary" routerLink="/receipts/upload">
+        Upload Receipt
+      </button>
+    </div>
+  
+    <div *ngIf="loading" class="loading">Loading receipts...</div>
+  
+    <div *ngIf="!loading && receipts.length === 0" class="empty-state">
+      <p>No receipts found. Upload your first receipt!</p>
+      <button mat-raised-button color="primary" routerLink="/receipts/upload">
+        Upload Receipt
+      </button>
+    </div>
+  
+    <div class="receipt-grid">
+      <mat-card *ngFor="let receipt of receipts" class="receipt-card">
+        <mat-card-header>
+          <mat-card-title>{{ receipt.storeName || 'Unknown Store' }}</mat-card-title>
+          <mat-card-subtitle>
+            {{ receipt.createdAt | date }} • {{ getTotalItems(receipt) }} items
+          </mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <p>Total: ${{ getTotalAmount(receipt) | number:'1.2-2' }}</p>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-button [routerLink]="['/receipts', receipt.id]">View Details</button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  </div>

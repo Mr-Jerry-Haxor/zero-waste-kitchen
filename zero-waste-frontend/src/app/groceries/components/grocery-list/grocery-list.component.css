@@ -1,0 +1,124 @@
+.grocery-container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .grocery-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  .search-bar {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .search-bar input {
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius);
+    min-width: 250px;
+  }
+  
+  .grocery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .grocery-card {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  
+  .grocery-info h3 {
+    margin-bottom: 0.5rem;
+    color: var(--dark-color);
+  }
+  
+  .grocery-info p {
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+  }
+  
+  .grocery-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+  
+  .btn-secondary {
+    padding: 0.5rem 1rem;
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .btn-secondary:hover {
+    background-color: var(--secondary-color);
+  }
+  
+  .btn-danger {
+    padding: 0.5rem 1rem;
+    background-color: var(--danger-color);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .btn-danger:hover {
+    background-color: #d32f2f;
+  }
+  
+  .loading {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-color);
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: 2rem;
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+  }
+  
+  .empty-state p {
+    margin-bottom: 1rem;
+  }
+  
+  @media (max-width: 768px) {
+    .grocery-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  
+    .search-bar {
+      width: 100%;
+    }
+  
+    .search-bar input {
+      flex: 1;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .grocery-grid {
+      grid-template-columns: 1fr;
+    }
+  }

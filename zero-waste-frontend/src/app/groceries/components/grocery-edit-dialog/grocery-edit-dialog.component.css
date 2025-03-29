@@ -1,0 +1,28 @@
+.form-row {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .quantity-field {
+    flex: 1;
+  }
+  
+  .unit-field {
+    width: 100px;
+  }
+  
+  mat-form-field {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+  
+  mat-radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+  
+  mat-radio-button {
+    margin-right: 1rem;
+  }

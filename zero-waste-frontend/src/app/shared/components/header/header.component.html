@@ -1,0 +1,14 @@
+<header class="header">
+    <div class="container">
+      <a routerLink="/" class="logo">Zero-Waste Kitchen</a>
+      <nav class="nav">
+        <ul class="nav-list">
+          <li><a routerLink="/groceries" routerLinkActive="active">Groceries</a></li>
+          <li><a routerLink="/receipts" routerLinkActive="active">Receipts</a></li>
+          <li *ngIf="!authService.isAuthenticated()"><a routerLink="/auth/login" routerLinkActive="active">Login</a></li>
+          <li *ngIf="!authService.isAuthenticated()"><a routerLink="/auth/register" routerLinkActive="active">Register</a></li>
+          <li *ngIf="authService.isAuthenticated()"><a (click)="logout()">Logout</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
