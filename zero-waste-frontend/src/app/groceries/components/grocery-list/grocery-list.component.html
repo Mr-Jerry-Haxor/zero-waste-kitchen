@@ -37,21 +37,42 @@
   
     <!-- Grocery List -->
     <div class="grocery-grid">
-      <div *ngFor="let grocery of filteredGroceries" class="grocery-card mat-elevation-z2">
+      <div 
+        *ngFor="let grocery of filteredGroceries" 
+        class="grocery-card mat-elevation-z2"
+        [ngClass]="{ 'expired-card': isExpired(grocery.expiry_date) }"
+      >
         <div class="grocery-info">
           <h3>{{ grocery.name }}</h3>
           <p><strong>Quantity:</strong> {{ grocery.quantity }} {{ grocery.unit }}</p>
           <p><strong>Expires:</strong> {{ grocery.expiry_date | date:'mediumDate' }}</p>
-          <p><strong>Location:</strong> {{ grocery.storage_location }}</p>
+          <p><strong>Location:</strong> {{ grocery.storageLocation }}</p>
           <p *ngIf="grocery.description">{{ grocery.description }}</p>
         </div>
+
+        <!-- Expired Watermark -->
+        <div *ngIf="isExpired(grocery.expiry_date)" class="expired-watermark">
+          EXPIRED
+        </div>
+
         <div class="grocery-actions">
+          <!-- Details Button -->
           <button 
             mat-raised-button 
             color="accent"
             [routerLink]="['/groceries', grocery.id]">
             <mat-icon>info</mat-icon> Details
           </button>
+
+          <!-- Edit Button -->
+          <button 
+            mat-raised-button 
+            color="primary"
+            (click)="openEditDialog(grocery)">
+            <mat-icon>edit</mat-icon> Edit
+          </button>
+
+          <!-- Delete Button -->
           <button 
             mat-raised-button 
             color="warn"

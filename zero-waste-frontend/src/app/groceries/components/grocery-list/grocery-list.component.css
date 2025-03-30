@@ -229,3 +229,34 @@
     margin-right: 8px;
     vertical-align: middle;
   }
+
+/* Styling for expired cards */
+.expired-card {
+  background-color: rgba(255, 0, 0, 0.1); /* Light red shade */
+  position: relative;
+  border: 1px solid rgba(255, 0, 0, 0.5); /* Red border */
+}
+
+/* Watermark for expired items */
+.expired-watermark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 24px;
+  font-weight: bold;
+  color: rgba(255, 0, 0, 0.5); /* Semi-transparent red */
+  pointer-events: none; /* Prevent interaction */
+  z-index: 1;
+}
+
+/* Ensure content is visible over the watermark */
+.grocery-info {
+  position: relative;
+  z-index: 2;
+}
+
+.grocery-actions {
+  position: relative;
+  z-index: 2;
+}

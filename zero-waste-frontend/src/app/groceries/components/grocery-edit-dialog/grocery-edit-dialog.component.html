@@ -28,6 +28,7 @@
       <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
       <mat-datepicker #picker></mat-datepicker>
       <mat-error *ngIf="groceryForm.get('expiryDate')?.hasError('required')">Expiry date is required</mat-error>
+      <mat-error *ngIf="groceryForm.get('expiryDate')?.hasError('pastDate')">Expiry date cannot be in the past or today</mat-error>
     </mat-form-field>
 
     <mat-form-field appearance="outline">

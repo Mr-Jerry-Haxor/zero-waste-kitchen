@@ -9,7 +9,7 @@ export interface GroceryItem {
   manufacture_date?: string;
   expiry_date?: string;
   description?: string; 
-  storage_location: string;
+  storageLocation: string;
   created_at: string;
   updated_at: string;
 }

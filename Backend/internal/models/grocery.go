@@ -23,7 +23,7 @@ type GroceryItem struct {
 	BatchNumber     string    `json:"batch_number"`
 	ManufactureDate time.Time `json:"manufacture_date"`
 	ExpiryDate      time.Time `json:"expiry_date"`
-	StorageLocation string    `gorm:"not null" json:"storage_location"`
+	StorageLocation string    `gorm:"not null" json:"storageLocation"`
 	CreatedAt       time.Time `json:"created_at"`
 	UpdatedAt       time.Time `json:"updated_at"`
 }

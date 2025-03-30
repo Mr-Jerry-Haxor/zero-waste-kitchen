@@ -94,6 +94,23 @@ export class GroceryListComponent implements OnInit {
     });
   }
 
+  openEditDialog(grocery: GroceryItem): void {
+    const dialogRef = this.dialog.open(GroceryEditDialogComponent, {
+      width: '400px',
+      data: { grocery }
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.loadGroceries();
+        this.snackBar.open('Grocery item updated successfully!', 'Close', {
+          duration: 3000,
+          panelClass: ['success-snackbar']
+        });
+      }
+    });
+  }
+
   deleteGrocery(id: number): void {
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
       width: '300px',
@@ -124,5 +141,12 @@ export class GroceryListComponent implements OnInit {
         });
       }
     });
+  }
+
+  isExpired(expiryDate: string | undefined): boolean {
+    if (!expiryDate) return false;
+    const today = new Date();
+    const expiry = new Date(expiryDate);
+    return expiry < today;
   }
 }

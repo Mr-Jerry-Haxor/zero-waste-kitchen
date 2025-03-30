@@ -1,6 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -10,6 +10,20 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatNativeDateModule } from '@angular/material/core';
 import { GroceryService } from '../../services/grocery.service';
 import { GroceryItem } from '../../models/grocery-item';
+
+// Custom validator to check if the date is in the past or today
+function pastDateValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const selectedDate = new Date(control.value);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset time to midnight for comparison
+
+    if (control.value && selectedDate <= today) {
+      return { pastDate: true };
+    }
+    return null;
+  };
+}
 
 @Component({
   selector: 'app-grocery-edit-dialog',
@@ -44,7 +58,7 @@ export class GroceryEditDialogComponent {
       name: ['', Validators.required],
       quantity: [0, [Validators.required, Validators.min(0.1)]],
       unit: ['', Validators.required],
-      expiryDate: ['', Validators.required],
+      expiryDate: ['', [Validators.required, pastDateValidator()]], // Added custom validator
       storageLocation: ['fridge', Validators.required]
     });
 

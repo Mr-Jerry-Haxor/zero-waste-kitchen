@@ -16,7 +16,7 @@ export class GroceryService {
       map((groceries) =>
         groceries.map((grocery) => ({
           ...grocery,
-          storageLocation: this.formatStorageLocation(grocery.storage_location),
+          storageLocation: this.formatStorageLocation(grocery.storageLocation),
           expiryDate: grocery.expiry_date,
           manufactureDate: grocery.manufacture_date
         }))

@@ -6,6 +6,8 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 import { AuthInterceptor } from './shared/interceptors/auth.interceptor';
 import { errorInterceptor } from './shared/interceptors/error.interceptor';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -31,5 +33,8 @@ export const appConfig: ApplicationConfig = {
     // Animations support
     provideAnimations(),
     provideAnimationsAsync(),
+    MatNativeDateModule,
+    MatDatepickerModule,
+    
   ]
 };
