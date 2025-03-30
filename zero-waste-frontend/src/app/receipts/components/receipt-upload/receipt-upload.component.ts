@@ -1,9 +1,11 @@
 import { Component } from '@angular/core';
 import { ReceiptService } from '../../services/receipt.service';
 import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-receipt-upload',
+  imports: [CommonModule],
   templateUrl: './receipt-upload.component.html',
   styleUrls: ['./receipt-upload.component.css']
 })
@@ -42,3 +44,6 @@ export class ReceiptUploadComponent {
     });
   }
 }
+
+
+

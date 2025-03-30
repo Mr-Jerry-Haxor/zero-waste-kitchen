@@ -16,6 +16,7 @@ import (
 	"zero-waste-kitchen/pkg/middleware"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber"
 )
 
 func main() {
@@ -195,4 +196,27 @@ func checkAndNotifyItems(threshold time.Duration) {
 			services.SendExpiryNotification(user, expiringItems)
 		}
 	}
+}
+
+func registerFCMToken(c *fiber.Ctx) error {
+	var payload struct {
+		Token string `json:"token"`
+	}
+
+	if err := c.BodyParser(&payload); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid request payload",
+		})
+	}
+
+	userID := c.Locals("userID").(uint) // Assuming userID is set in middleware
+	if err := database.DB.Model(&models.User{}).Where("id = ?", userID).Update("fcm_token", payload.Token).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to update FCM token",
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"message": "FCM token registered successfully",
+	})
 }

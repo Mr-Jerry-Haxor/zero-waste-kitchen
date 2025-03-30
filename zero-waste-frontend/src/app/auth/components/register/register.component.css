@@ -48,8 +48,8 @@
   .btn-primary {
     width: 100%;
     padding: 0.75rem;
-    background-color: var(--primary-color);
-    color: white;
+    background-color: #1e87ff;
+    color: rgb(255, 255, 255);
     border: none;
     border-radius: var(--border-radius);
     font-size: 1rem;
@@ -58,7 +58,7 @@
   }
   
   .btn-primary:hover {
-    background-color: var(--secondary-color);
+    background-color: #0056b3;
   }
   
   .btn-primary:disabled {

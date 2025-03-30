@@ -8,7 +8,7 @@
   }
   
   .unit-field {
-    width: 100px;
+    width: 150px;
   }
   
   mat-form-field {
@@ -16,13 +16,19 @@
     margin-bottom: 1rem;
   }
   
-  mat-radio-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
+  .error-message {
+    color: #f44336;
+    margin: 1rem 0;
+    padding: 0.5rem;
+    background-color: #ffebee;
+    border-radius: 4px;
   }
   
-  mat-radio-button {
-    margin-right: 1rem;
+  button[mat-raised-button] {
+    margin-left: 8px;
+  }
+  
+  .mat-mdc-dialog-actions {
+    justify-content: flex-end;
+    padding: 16px 24px;
   }

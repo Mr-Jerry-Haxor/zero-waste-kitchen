@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authGuard } from './core/guards/auth.guard';
+import { AuthGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
 
 export const routes: Routes = [
@@ -16,15 +16,15 @@ export const routes: Routes = [
   {
     path: 'groceries',
     loadChildren: () => import('./groceries/groceries.module').then(m => m.GroceriesModule),
-    canActivate: [authGuard]
+    canActivate: [AuthGuard]
   },
   {
     path: 'receipts',
     loadChildren: () => import('./receipts/receipts.module').then(m => m.ReceiptsModule),
-    canActivate: [authGuard]
+    canActivate: [AuthGuard]
   },
   {
     path: '**',
-    redirectTo: ''
+    redirectTo: 'groceries'
   }
 ];

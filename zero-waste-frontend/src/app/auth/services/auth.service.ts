@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
+import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 
 interface AuthResponse {
   token: string;
@@ -15,7 +16,8 @@ export class AuthService {
   private tokenSubject = new BehaviorSubject<string | null>(null);
 
   constructor(private http: HttpClient, private router: Router) {
-    this.tokenSubject.next(localStorage.getItem('token'));
+    const token = localStorage.getItem('token');
+    this.tokenSubject.next(token);
   }
 
   register(name: string, email: string, password: string): Observable<AuthResponse> {
@@ -30,7 +32,9 @@ export class AuthService {
     return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/login`, {
       email, password
     }).pipe(
-      tap(response => this.storeToken(response.token))
+      tap(response => {
+        this.storeToken(response.token);
+      })
     );
   }
 
@@ -41,11 +45,22 @@ export class AuthService {
   }
 
   getToken(): string | null {
-    return this.tokenSubject.value;
+    const token = this.tokenSubject.value || localStorage.getItem('token');
+    return token;
   }
 
   isAuthenticated(): boolean {
-    return !!this.tokenSubject.value;
+    const token = this.tokenSubject.value || localStorage.getItem('token');
+    return !!token; // Returns true if a token exists, false otherwise
+  }
+
+  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
+    if (this.isAuthenticated()) {
+      return true;
+    } else {
+      this.router.navigate(['/auth/login'], { queryParams: { returnUrl: state.url } });
+      return false;
+    }
   }
 
   private storeToken(token: string): void {

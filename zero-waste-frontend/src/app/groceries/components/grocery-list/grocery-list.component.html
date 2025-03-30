@@ -4,31 +4,60 @@
       <div class="search-bar">
         <input 
           type="text" 
-          [(ngModel)]="searchTerm" 
+          [(ngModel)]="searchTerm"
           (input)="filterGroceries()"
-          placeholder="Search groceries...">
-        <button routerLink="/groceries/new" class="btn-primary">Add New</button>
+          placeholder="Search groceries..."
+          aria-label="Search groceries">
+        <button mat-raised-button color="primary" (click)="openAddDialog()">
+          <mat-icon>add</mat-icon> Add New
+        </button>
       </div>
     </div>
   
-    <div *ngIf="loading" class="loading">Loading...</div>
-  
-    <div *ngIf="!loading && filteredGroceries.length === 0" class="empty-state">
-      <p>No groceries found. Add some items to get started!</p>
-      <button routerLink="/groceries/new" class="btn-primary">Add First Item</button>
+    <!-- Error Message -->
+    <div *ngIf="error" class="error-message">
+      {{ error }}
+      <button mat-button (click)="loadGroceries()">Retry</button>
     </div>
   
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading">
+      <mat-spinner diameter="50"></mat-spinner>
+      <p>Loading your groceries...</p>
+    </div>
+  
+    <!-- Empty State -->
+    <div *ngIf="!loading && filteredGroceries.length === 0" class="empty-state">
+      <p>No groceries found</p>
+      <p *ngIf="searchTerm">No results for "{{ searchTerm }}"</p>
+      <button mat-raised-button color="primary" (click)="openAddDialog()">
+        <mat-icon>add</mat-icon> Add Your First Item
+      </button>
+    </div>
+  
+    <!-- Grocery List -->
     <div class="grocery-grid">
-      <div *ngFor="let grocery of filteredGroceries" class="grocery-card">
+      <div *ngFor="let grocery of filteredGroceries" class="grocery-card mat-elevation-z2">
         <div class="grocery-info">
           <h3>{{ grocery.name }}</h3>
-          <p>{{ grocery.quantity }} {{ grocery.unit }}</p>
-          <p>Expires: {{ grocery.expiryDate | date }}</p>
-          <p>Location: {{ grocery.storageLocation }}</p>
+          <p><strong>Quantity:</strong> {{ grocery.quantity }} {{ grocery.unit }}</p>
+          <p><strong>Expires:</strong> {{ grocery.expiry_date | date:'mediumDate' }}</p>
+          <p><strong>Location:</strong> {{ grocery.storage_location }}</p>
+          <p *ngIf="grocery.description">{{ grocery.description }}</p>
         </div>
         <div class="grocery-actions">
-          <button (click)="viewDetails(grocery.id)" class="btn-secondary">Details</button>
-          <button (click)="deleteGrocery(grocery.id)" class="btn-danger">Delete</button>
+          <button 
+            mat-raised-button 
+            color="accent"
+            [routerLink]="['/groceries', grocery.id]">
+            <mat-icon>info</mat-icon> Details
+          </button>
+          <button 
+            mat-raised-button 
+            color="warn"
+            (click)="deleteGrocery(grocery.id)">
+            <mat-icon>delete</mat-icon> Delete
+          </button>
         </div>
       </div>
     </div>
