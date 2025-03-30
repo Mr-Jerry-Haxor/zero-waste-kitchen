@@ -34,9 +34,9 @@
     <mat-form-field appearance="outline">
       <mat-label>Storage Location</mat-label>
       <mat-select formControlName="storageLocation">
-        <mat-option value="fridge">Fridge</mat-option>
-        <mat-option value="pantry">Pantry</mat-option>
-        <mat-option value="freezer">Freezer</mat-option>
+        <mat-option value="Fridge">Fridge</mat-option>
+        <mat-option value="Pantry">Pantry</mat-option>
+        <mat-option value="Freezer">Freezer</mat-option>
       </mat-select>
       <mat-error *ngIf="groceryForm.get('storageLocation')?.hasError('required')">Storage location is required</mat-error>
     </mat-form-field>

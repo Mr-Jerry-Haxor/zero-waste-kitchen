@@ -158,10 +158,13 @@ func startNotificationService() {
 	for {
 		select {
 		case <-sevenDayTicker.C:
+			log.Println("Checking for items expiring in 7 days...")
 			checkAndNotifyItems(7 * 24 * time.Hour)
 		case <-threeDayTicker.C:
+			log.Println("Checking for items expiring in 3 days...")
 			checkAndNotifyItems(3 * 24 * time.Hour)
 		case <-oneDayTicker.C:
+			log.Println("Checking for items expiring in 1 day...")
 			checkAndNotifyItems(24 * time.Hour)
 		}
 	}

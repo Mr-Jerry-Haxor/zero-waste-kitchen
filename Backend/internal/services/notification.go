@@ -21,21 +21,25 @@ var (
 func InitializeFirebase() error {
 	ctx := context.Background()
 
-	// Use environment variables
+	// Use environment variables for Firebase configuration
 	conf := &firebase.Config{
 		ProjectID: os.Getenv("FIREBASE_PROJECT_ID"),
 	}
 
+	// Ensure the service account key file exists
 	opt := option.WithCredentialsFile("serviceAccountKey.json")
+	if _, err := os.Stat("serviceAccountKey.json"); os.IsNotExist(err) {
+		return fmt.Errorf("serviceAccountKey.json file not found")
+	}
 
 	app, err := firebase.NewApp(ctx, conf, opt)
 	if err != nil {
-		return fmt.Errorf("error initializing app: %v", err)
+		return fmt.Errorf("error initializing Firebase app: %v", err)
 	}
 
 	fcmClient, err = app.Messaging(ctx)
 	if err != nil {
-		return fmt.Errorf("error getting messaging client: %v", err)
+		return fmt.Errorf("error getting Firebase messaging client: %v", err)
 	}
 
 	log.Println("Firebase Cloud Messaging initialized successfully")
@@ -55,7 +59,7 @@ func SendExpiryNotification(user models.User, items []models.GroceryItem) {
 		return
 	}
 
-	// Use time.Until instead of expiryDate.Sub(time.Now())
+	// Calculate days left until expiry
 	daysLeft := int(time.Until(items[0].ExpiryDate).Hours() / 24)
 	notificationTitle := fmt.Sprintf("%d items expiring in %d days", len(items), daysLeft)
 
@@ -82,11 +86,11 @@ func SendExpiryNotification(user models.User, items []models.GroceryItem) {
 
 	response, err := fcmClient.Send(ctx, message)
 	if err != nil {
-		log.Printf("Failed to send FCM message: %v", err)
+		log.Printf("Failed to send FCM message to user %s: %v", user.Email, err)
 		return
 	}
 
-	log.Printf("Successfully sent FCM message: %v", response)
+	log.Printf("Successfully sent FCM message to user %s: %v", user.Email, response)
 }
 
 func prepareNotificationBody(items []models.GroceryItem) string {
