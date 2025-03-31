@@ -1,0 +1,27 @@
+<div class="user-list">
+  <h1>Users</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Is Admin</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of users">
+        <td>{{ user.is_admin }}</td>
+        <td>{{ user.name }}</td>
+        <td>{{ user.email }}</td>
+        <td>
+          <button 
+            [disabled]="!user.fcm_token" 
+            (click)="openNotificationDialog(user.id)">
+            Send Notification
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

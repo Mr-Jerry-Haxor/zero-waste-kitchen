@@ -4,6 +4,7 @@ import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { NotificationService } from '../../../shared/services/notification.service';
 
 @Component({
   selector: 'app-login',
@@ -20,6 +21,7 @@ errorMessage = '';
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
+    private notificationService: NotificationService,
     private snackBar: MatSnackBar
   ) {
     this.loginForm = this.fb.group({
@@ -40,6 +42,9 @@ errorMessage = '';
           panelClass: ['success-snackbar']
         });
         this.router.navigate(['/groceries']);
+        this.notificationService.requestPermission().subscribe({
+          error: (err) => console.error('Failed to get notification permission:', err)
+        });
       },
       error: (err) => {
         console.error('Login error:', err);

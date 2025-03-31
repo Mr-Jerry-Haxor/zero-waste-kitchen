@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"strings"
 	"time"
+	"zero-waste-kitchen/internal/models"
+	"zero-waste-kitchen/pkg/database"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
@@ -109,4 +111,35 @@ func GenerateToken(userID uint) (string, error) {
 	})
 
 	return token.SignedString(jwtSecret)
+}
+
+func RequireAdmin() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Retrieve userID from the context (set by JWTAuthMiddleware)
+		userID, exists := c.Get("userID")
+		if !exists {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized: User ID not found in token"})
+			c.Abort()
+			return
+		}
+
+		// Fetch the user from the database
+		var user models.User
+		if err := database.DB.First(&user, userID).Error; err != nil {
+			c.JSON(http.StatusForbidden, gin.H{"error": "Access denied: User not found"})
+			c.Abort()
+			return
+		}
+
+		// Check if the user is an admin
+		if !user.IsAdmin {
+			c.JSON(http.StatusForbidden, gin.H{"error": "Access denied: Admin privileges required"})
+			c.Abort()
+			return
+		}
+
+		// Set isAdmin in the context for further use
+		c.Set("isAdmin", true)
+		c.Next()
+	}
 }

@@ -24,6 +24,11 @@ export const routes: Routes = [
     canActivate: [AuthGuard]
   },
   {
+    path: 'admin',
+    loadChildren: () => import('./admin/admin.module').then(m => m.AdminModule),
+    canActivateChild: [AuthGuard] // Protect admin routes
+  },
+  {
     path: '**',
     redirectTo: 'groceries'
   }

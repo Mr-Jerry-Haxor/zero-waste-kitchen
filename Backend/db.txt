@@ -18,7 +18,7 @@ Edit the PostgreSQL configuration files:
 bash
 Copy
 # Edit the main configuration file
-sudo nano /etc/postgresql/<version>/main/postgresql.conf
+sudo nano /etc/postgresql/16/main/postgresql.conf
 Replace <version> with your PostgreSQL version (e.g., 14, 15, etc.)
 
 Find the line that says:
@@ -32,7 +32,7 @@ listen_addresses = '*'
 Edit the pg_hba.conf file:
 bash
 Copy
-sudo nano /etc/postgresql/<version>/main/pg_hba.conf
+sudo nano /etc/postgresql/16/main/pg_hba.conf
 Add this line at the end of the file to allow connections from your network (replace IP with your server's IP or network range):
 
 Copy

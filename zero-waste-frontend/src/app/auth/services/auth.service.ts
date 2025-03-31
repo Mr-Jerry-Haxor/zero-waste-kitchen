@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, Observable, tap, map, catchError } from 'rxjs';
 import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
@@ -62,6 +62,28 @@ export class AuthService {
       return false;
     }
   }
+
+  isAdmin(): Observable<boolean> {
+      const token = this.getToken();
+      if (!token) {
+        return new BehaviorSubject(false).asObservable(); // Return false if no token exists
+      }
+    
+      return this.http.get<{ is_admin: boolean }>(`${environment.apiUrl}/auth/isadmin`).pipe(
+        tap(response => {
+          if (!response.is_admin) {
+            console.warn('User is not an admin');
+          }
+        }),
+        // Map the response to return only the is_admin value
+        map(response => response.is_admin),
+        catchError(() => {
+          console.error('Failed to check admin status');
+          return new BehaviorSubject(false).asObservable(); // Return false on error
+        })
+      );
+    }
+
 
   private storeToken(token: string): void {
     localStorage.setItem('token', token);

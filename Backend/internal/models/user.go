@@ -25,7 +25,8 @@ type User struct {
 	Name      string    `gorm:"not null" json:"name"`
 	Email     string    `gorm:"unique;not null" json:"email"`
 	Password  string    `gorm:"not null" json:"password"`
-	FCMToken  string    `json:"-"`
+	FCMToken  string    `json:"fcm_token"`
+	IsAdmin   bool      `gorm:"default:false" json:"is_admin"` // New field
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }

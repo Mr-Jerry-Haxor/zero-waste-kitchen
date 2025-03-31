@@ -107,8 +107,16 @@ func registerRoutes(router *gin.Engine) {
 		{
 			auth.POST("/register", controllers.Register)
 			auth.POST("/login", controllers.Login)
+			auth.GET("/isadmin", middleware.JWTAuthMiddleware(), controllers.CheckAdminStatus) // New endpoint
 		}
 
+		// Admin routes
+		adminRoutes := api.Group("/admin")
+		adminRoutes.Use(middleware.JWTAuthMiddleware(), middleware.RequireAdmin()) // Middleware to check if user is admin
+		{
+			adminRoutes.GET("/users", controllers.GetUsersList)
+			adminRoutes.POST("/send-notification", controllers.SendNotification)
+		}
 		// Protected routes
 		protected := api.Group("")
 		protected.Use(middleware.JWTAuthMiddleware())

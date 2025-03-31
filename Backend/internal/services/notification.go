@@ -93,6 +93,33 @@ func SendExpiryNotification(user models.User, items []models.GroceryItem) {
 	log.Printf("Successfully sent FCM message to user %s: %v", user.Email, response)
 }
 
+func SendPushNotification(token, message string) error {
+	// Ensure Firebase is initialized
+	if fcmClient == nil {
+		return fmt.Errorf("FCM client not initialized. Call InitializeFirebase first")
+	}
+
+	ctx := context.Background()
+
+	msg := &messaging.Message{
+		Token: token,
+		Notification: &messaging.Notification{
+			Title: "Grocery Notification",
+			Body:  message,
+		},
+	}
+
+	// Send the notification and log the error if it fails
+	response, err := fcmClient.Send(ctx, msg)
+	if err != nil {
+		return fmt.Errorf("FCM send failed: %v", err)
+	}
+
+	// Log the response for debugging
+	log.Printf("FCM response: %s\n", response)
+	return nil
+}
+
 func prepareNotificationBody(items []models.GroceryItem) string {
 	if len(items) == 1 {
 		return fmt.Sprintf("%s is expiring on %s", items[0].Name, items[0].ExpiryDate.Format("Jan 2"))
