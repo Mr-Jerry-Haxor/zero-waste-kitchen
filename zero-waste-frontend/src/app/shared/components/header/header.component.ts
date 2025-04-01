@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../../auth/services/auth.service';
 import { NotificationService } from '../../services/notification.service';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
@@ -13,24 +13,35 @@ import { MatIconModule } from '@angular/material/icon';
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css']
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent implements OnInit, OnDestroy {
   isMenuOpen = false;
-  isAdmin$: Observable<boolean>;
+  isAdmin = false; // Store admin status as a boolean
   notificationsEnabled$: Observable<boolean>;
+  private adminSubscription!: Subscription;
 
   constructor(
     public authService: AuthService,
     private notificationService: NotificationService
   ) {
     this.notificationsEnabled$ = this.notificationService.getNotificationStatus();
-    this.isAdmin$ = this.authService.isAdmin();
   }
 
   ngOnInit(): void {
+    // Check admin status immediately if authenticated
     if (this.authService.isAuthenticated()) {
-      this.notificationService.requestPermission().subscribe({
-        error: (err) => console.error('Failed to get notification permission:', err)
-      });
+      this.authService.checkAdminStatus().subscribe();
+    }
+    
+    // Then subscribe to changes
+    this.adminSubscription = this.authService.isAdmin$().subscribe((isAdmin) => {
+      this.isAdmin = isAdmin;
+    });
+  }
+
+  ngOnDestroy(): void {
+    // Unsubscribe to avoid memory leaks
+    if (this.adminSubscription) {
+      this.adminSubscription.unsubscribe();
     }
   }
 
@@ -39,10 +50,8 @@ export class HeaderComponent implements OnInit {
   }
 
   toggleNotifications(): void {
-    // this.notificationsEnabled$.subscribe((enabled) => {
-    //   this.notificationService.toggleNotifications(!enabled);
-    // });
-  }
+    // this.notificationService.toggleNotificationStatus();
+    }
 
   logout(): void {
     this.authService.logout();

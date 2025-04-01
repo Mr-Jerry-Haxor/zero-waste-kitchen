@@ -29,7 +29,7 @@ export class AuthGuard implements CanActivate, CanActivateChild {
   }
 
   canActivateChild(): Observable<boolean> {
-    return this.authService.isAdmin().pipe(
+    return this.authService.checkAdminStatus$().pipe(
       tap((isAdmin) => {
         if (!isAdmin) {
           this.snackBar.open('You are not authorized to access this page.', 'Dismiss', {

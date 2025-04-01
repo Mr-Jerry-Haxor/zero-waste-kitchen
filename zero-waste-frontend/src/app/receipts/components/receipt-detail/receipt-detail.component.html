@@ -8,7 +8,6 @@
     <div *ngIf="receipt && !loading" class="receipt-detail">
       <div *ngIf="receipt">
         <span>{{ receipt.createdAt | date }}</span>
-        <span>{{ receipt.items?.length || 0 }} items</span>
       </div>
       
       <div class="receipt-image" *ngIf="receipt.imagePath">

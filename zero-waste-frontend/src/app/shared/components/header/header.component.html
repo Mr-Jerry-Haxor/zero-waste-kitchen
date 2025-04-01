@@ -10,8 +10,8 @@
         <li *ngIf="authService.isAuthenticated()">
           <a routerLink="/receipts" routerLinkActive="active">Receipts</a>
         </li>
-        <li *ngIf="isAdmin$ | async">
-            <a routerLink="/admin" routerLinkActive="active">Admin</a>
+        <li *ngIf="isAdmin">
+          <a routerLink="/admin" routerLinkActive="active">Admin</a>
         </li>
         <li *ngIf="authService.isAuthenticated()">
           <button class="logout-btn" (click)="logout()">Logout</button>

@@ -111,11 +111,11 @@ export class NotificationService {
   }
 
   private async registerTokenWithBackend(token: string): Promise<void> {
-    const storedToken = localStorage.getItem('fcm_token');
-    if (storedToken === token) {
-      console.log('Token already registered');
-      return;
-    }
+    // const storedToken = localStorage.getItem('fcm_token');
+    // if (storedToken === token) {
+    //   console.log('Token already registered');
+    //   return;
+    // }
 
     const authToken = this.authService.getToken();
     if (!authToken) throw new Error('User not authenticated');

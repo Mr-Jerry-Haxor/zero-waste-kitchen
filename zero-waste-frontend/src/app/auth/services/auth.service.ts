@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, tap, map, catchError } from 'rxjs';
+import { BehaviorSubject, Observable, tap, catchError, of } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
@@ -14,10 +15,16 @@ interface AuthResponse {
 })
 export class AuthService {
   private tokenSubject = new BehaviorSubject<string | null>(null);
+  private isAdminSubject = new BehaviorSubject<boolean>(false); // Store admin status
 
   constructor(private http: HttpClient, private router: Router) {
     const token = localStorage.getItem('token');
     this.tokenSubject.next(token);
+  
+    // Check admin status on initialization if token exists
+    if (token) {
+      this.checkAdminStatus().subscribe();
+    }
   }
 
   register(name: string, email: string, password: string): Observable<AuthResponse> {
@@ -34,6 +41,7 @@ export class AuthService {
     }).pipe(
       tap(response => {
         this.storeToken(response.token);
+        this.checkAdminStatus().subscribe(); // Check admin status on login
       })
     );
   }
@@ -41,17 +49,20 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem('token');
     this.tokenSubject.next(null);
+    this.isAdminSubject.next(false); // Reset admin status on logout
     this.router.navigate(['/auth/login']);
   }
 
   getToken(): string | null {
-    const token = this.tokenSubject.value || localStorage.getItem('token');
-    return token;
+    return this.tokenSubject.value || localStorage.getItem('token');
   }
 
   isAuthenticated(): boolean {
-    const token = this.tokenSubject.value || localStorage.getItem('token');
-    return !!token; // Returns true if a token exists, false otherwise
+    return !!this.getToken();
+  }
+
+  isAdmin$(): Observable<boolean> {
+    return this.isAdminSubject.asObservable(); // Expose admin status as an observable
   }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
@@ -63,27 +74,57 @@ export class AuthService {
     }
   }
 
-  isAdmin(): Observable<boolean> {
-      const token = this.getToken();
-      if (!token) {
-        return new BehaviorSubject(false).asObservable(); // Return false if no token exists
-      }
-    
-      return this.http.get<{ is_admin: boolean }>(`${environment.apiUrl}/auth/isadmin`).pipe(
-        tap(response => {
-          if (!response.is_admin) {
-            console.warn('User is not an admin');
-          }
-        }),
-        // Map the response to return only the is_admin value
-        map(response => response.is_admin),
-        catchError(() => {
-          console.error('Failed to check admin status');
-          return new BehaviorSubject(false).asObservable(); // Return false on error
-        })
-      );
+  checkAdminStatus$(): Observable<boolean> {
+    const token = this.getToken();
+    if (!token) {
+      this.isAdminSubject.next(false);
+      return of(false);
     }
 
+    return this.http.get<{ is_admin: boolean }>(`${environment.apiUrl}/auth/isadmin`).pipe(
+      tap(response => this.isAdminSubject.next(response.is_admin)),
+      catchError(() => {
+        this.isAdminSubject.next(false);
+        return of(false);
+      }),
+      map(response => typeof response === 'object' && response.is_admin) // Transform the response to a boolean
+    );
+  }
+
+  // auth.service.ts
+
+  checkAdminStatus(): Observable<boolean> {
+    const token = this.getToken();
+    if (!token) {
+      this.isAdminSubject.next(false);
+      return of(false);
+    }
+
+    return this.http.get<{ is_admin: boolean }>(`${environment.apiUrl}/auth/isadmin`).pipe(
+      tap(response => this.isAdminSubject.next(response.is_admin)),
+      catchError(() => {
+        this.isAdminSubject.next(false);
+        return of(false);
+      }),
+      map(response => typeof response === 'object' && response.is_admin)
+    );
+  }
+
+  // private checkAdminStatus(): void {
+  //   const token = this.getToken();
+  //   if (!token) {
+  //     this.isAdminSubject.next(false);
+  //     return;
+  //   }
+
+  //   this.http.get<{ is_admin: boolean }>(`${environment.apiUrl}/auth/isadmin`).pipe(
+  //     tap(response => this.isAdminSubject.next(response.is_admin)),
+  //     catchError(() => {
+  //       this.isAdminSubject.next(false);
+  //       return of(false);
+  //     })
+  //   ).subscribe();
+  // }
 
   private storeToken(token: string): void {
     localStorage.setItem('token', token);
