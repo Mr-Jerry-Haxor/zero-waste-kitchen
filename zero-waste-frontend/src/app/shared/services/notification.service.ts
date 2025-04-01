@@ -18,6 +18,7 @@ export class NotificationService {
   private messaging: Messaging | null = null;
   private isMessagingInitialized = new BehaviorSubject<boolean>(false);
   private notificationsEnabled = new BehaviorSubject<boolean>(false);
+  private notificationListenerActive = false;
 
   constructor() {
     this.initializeMessaging();
@@ -25,15 +26,20 @@ export class NotificationService {
 
   private async initializeMessaging(): Promise<void> {
     if (this.messaging || !(await isSupported())) return;
-  
+
     try {
       const app = initializeApp(environment.firebase);
       this.messaging = getMessaging(app);
-  
-      // Register the service worker
-      const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
-      console.log('Service worker registered:', registration);
-  
+
+      // Check if the service worker is already registered
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      if (registrations.some((reg) => reg.active?.scriptURL.includes('firebase-messaging-sw.js'))) {
+        console.log('Service worker already registered');
+      } else {
+        const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+        console.log('Service worker registered:', registration);
+      }
+
       this.isMessagingInitialized.next(true);
     } catch (error) {
       console.error('Firebase initialization failed:', error);
@@ -80,6 +86,12 @@ export class NotificationService {
       return () => {};
     }
 
+    if (this.notificationListenerActive) {
+      console.log('Notification listener already active');
+      return () => {};
+    }
+
+    this.notificationListenerActive = true;
     return onMessage(this.messaging, callback);
   }
 
@@ -99,9 +111,15 @@ export class NotificationService {
   }
 
   private async registerTokenWithBackend(token: string): Promise<void> {
+    const storedToken = localStorage.getItem('fcm_token');
+    if (storedToken === token) {
+      console.log('Token already registered');
+      return;
+    }
+
     const authToken = this.authService.getToken();
     if (!authToken) throw new Error('User not authenticated');
-  
+
     return this.http.post(`${environment.apiUrl}/user/fcm-token`, { token }, {
       headers: { Authorization: `Bearer ${authToken}` }
     }).toPromise()
