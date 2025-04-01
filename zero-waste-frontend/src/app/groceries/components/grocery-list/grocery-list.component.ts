@@ -1,4 +1,3 @@
-// grocery-list.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -7,11 +6,19 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatIconModule } from '@angular/material/icon';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatSelectModule } from '@angular/material/select';
+import { MatInputModule } from '@angular/material/input';
+import { MatCardModule } from '@angular/material/card';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 import { GroceryService } from '../../services/grocery.service';
 import { GroceryItem } from '../../models/grocery-item';
 import { ConfirmationDialogComponent } from '../../../shared/components/confirmation-dialog/confirmation-dialog.component';
-import { MatIconModule } from '@angular/material/icon';
 import { GroceryEditDialogComponent } from '../grocery-edit-dialog/grocery-edit-dialog.component';
 
 @Component({
@@ -22,10 +29,18 @@ import { GroceryEditDialogComponent } from '../grocery-edit-dialog/grocery-edit-
     RouterModule,
     FormsModule,
     MatButtonModule,
-    MatIconModule, // Add this for mat-icon
+    MatIconModule,
     MatDialogModule,
     MatProgressSpinnerModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatPaginatorModule,
+    MatSelectModule,
+    MatInputModule,
+    MatCardModule,
+    MatTooltipModule,
+    MatChipsModule,
+    MatMenuModule,
+    MatFormFieldModule 
   ],
   templateUrl: './grocery-list.component.html',
   styleUrls: ['./grocery-list.component.css']
@@ -34,8 +49,18 @@ export class GroceryListComponent implements OnInit {
   groceries: GroceryItem[] = [];
   filteredGroceries: GroceryItem[] = [];
   loading = true;
-  searchTerm = '';
   error: string | null = null;
+  
+  // Filter properties
+  searchTerm = '';
+  expiryFilter: string | null = null;
+  storageLocationFilter: string | null = null;
+  storageLocations: string[] = [];
+  
+  // Pagination properties
+  pageSize = 8;
+  pageIndex = 0;
+  pageSizeOptions = [4, 8, 12, 24];
 
   constructor(
     private groceryService: GroceryService,
@@ -54,7 +79,8 @@ export class GroceryListComponent implements OnInit {
     this.groceryService.getAllGroceries().subscribe({
       next: (groceries) => {
         this.groceries = groceries;
-        this.filteredGroceries = [...groceries];
+        this.storageLocations = [...new Set(groceries.map(g => g.storageLocation))];
+        this.applyFilters();
         this.loading = false;
       },
       error: (err) => {
@@ -65,16 +91,56 @@ export class GroceryListComponent implements OnInit {
     });
   }
 
-  filterGroceries(): void {
-    if (!this.searchTerm.trim()) {
-      this.filteredGroceries = [...this.groceries];
-      return;
+  applyFilters(): void {
+    let filtered = [...this.groceries];
+    
+    // Apply search filter
+    if (this.searchTerm.trim()) {
+      const term = this.searchTerm.toLowerCase().trim();
+      filtered = filtered.filter(grocery => 
+        grocery.name.toLowerCase().includes(term)
+      );
+    }
+    
+    // Apply expiry filter
+    if (this.expiryFilter) {
+      const days = parseInt(this.expiryFilter);
+      filtered = filtered.filter(grocery => {
+        if (!grocery.expiry_date) return false;
+        const expiryDate = new Date(grocery.expiry_date);
+        const today = new Date();
+        const diffTime = expiryDate.getTime() - today.getTime();
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        return diffDays <= days && diffDays >= 0;
+      });
+    }
+    
+    // Apply storage location filter
+    if (this.storageLocationFilter) {
+      filtered = filtered.filter(grocery => 
+        grocery.storageLocation === this.storageLocationFilter
+      );
     }
 
-    const term = this.searchTerm.toLowerCase().trim();
-    this.filteredGroceries = this.groceries.filter((grocery) =>
-      grocery.name.toLowerCase().includes(term)
-    );
+    this.filteredGroceries = filtered;
+    this.pageIndex = 0; // Reset to first page when filters change
+  }
+
+  clearFilters(): void {
+    this.searchTerm = '';
+    this.expiryFilter = null;
+    this.storageLocationFilter = null;
+    this.applyFilters();
+  }
+
+  getPaginatedItems(): GroceryItem[] {
+    const startIndex = this.pageIndex * this.pageSize;
+    return this.filteredGroceries.slice(startIndex, startIndex + this.pageSize);
+  }
+
+  onPageChange(event: PageEvent): void {
+    this.pageIndex = event.pageIndex;
+    this.pageSize = event.pageSize;
   }
 
   openAddDialog(): void {
@@ -125,7 +191,7 @@ export class GroceryListComponent implements OnInit {
         this.groceryService.deleteGrocery(id.toString()).subscribe({
           next: () => {
             this.groceries = this.groceries.filter((grocery) => grocery.id !== id);
-            this.filterGroceries();
+            this.applyFilters();
             this.snackBar.open('Grocery item deleted successfully!', 'Close', {
               duration: 3000,
               panelClass: ['success-snackbar']

@@ -8,6 +8,7 @@ import { errorInterceptor } from './shared/interceptors/error.interceptor';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { MatChipsModule } from '@angular/material/chips';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -35,6 +36,7 @@ export const appConfig: ApplicationConfig = {
     provideAnimationsAsync(),
     MatNativeDateModule,
     MatDatepickerModule,
+    MatChipsModule,
     
   ]
 };
