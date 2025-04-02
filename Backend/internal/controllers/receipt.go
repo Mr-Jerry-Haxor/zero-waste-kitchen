@@ -1,9 +1,8 @@
 package controllers
 
 import (
+	"encoding/json"
 	"net/http"
-	"os"
-	"path/filepath"
 	"time"
 	"zero-waste-kitchen/internal/models"
 	"zero-waste-kitchen/pkg/database"
@@ -11,59 +10,107 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// receipt_controller.go
 func UploadReceipt(c *gin.Context) {
-	userID := c.GetUint("userID")
+	// Initialize variables
+	var filePath string
 
-	file, err := c.FormFile("receipt")
+	// Check if file was uploaded
+	fileHeader, err := c.FormFile("file")
+	if err == nil {
+		// File was provided, save it
+		filePath = "uploads/" + fileHeader.Filename
+		if err := c.SaveUploadedFile(fileHeader, filePath); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save file"})
+			return
+		}
+	} else if err != http.ErrMissingFile {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Parse receipt data
+	receiptJSON := c.PostForm("receipt")
+	if receiptJSON == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing receipt data"})
+		return
+	}
+
+	var receiptData struct {
+		StoreName    string  `json:"storeName"`
+		PurchaseDate string  `json:"purchaseDate"`
+		TotalAmount  float64 `json:"totalAmount"`
+		Items        []struct {
+			Name            string  `json:"name"`
+			Quantity        float64 `json:"quantity"`
+			Unit            string  `json:"unit"`
+			Price           float64 `json:"price"`
+			ExpiryDate      string  `json:"expiryDate"`
+			StorageLocation string  `json:"storageLocation"`
+		} `json:"items"`
+	}
+
+	if err := json.Unmarshal([]byte(receiptJSON), &receiptData); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid receipt data: " + err.Error()})
+		return
+	}
+
+	// Parse dates
+	purchaseDate, err := time.Parse("2006-01-02", receiptData.PurchaseDate)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "No file uploaded"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid purchase date format"})
 		return
 	}
 
-	// Create uploads directory if it doesn't exist
-	if err := os.MkdirAll("uploads", os.ModePerm); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create upload directory"})
+	// Get user ID from context
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
 		return
 	}
 
-	// Generate unique filename
-	filename := filepath.Join("uploads", time.Now().Format("20060102150405")+"_"+file.Filename)
-	if err := c.SaveUploadedFile(file, filename); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save file"})
-		return
-	}
-
-	// Process receipt with OCR (mock implementation)
-	items, err := processReceipt(filename)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to process receipt"})
-		return
-	}
-
-	// Create receipt record
+	// Create receipt
 	receipt := models.Receipt{
-		UserID:       userID,
-		ImagePath:    filename,
-		PurchaseDate: time.Now(),
+		UserID:       userID.(uint),
+		ImagePath:    filePath,
+		StoreName:    receiptData.StoreName,
+		PurchaseDate: purchaseDate,
+		TotalAmount:  receiptData.TotalAmount,
 	}
 
+	// Save receipt to database
 	if err := database.DB.Create(&receipt).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save receipt"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create receipt"})
 		return
 	}
 
-	// Add items to inventory
-	for _, item := range items {
-		item.UserID = userID
-		item.ReceiptID = &receipt.ID // Assign the receipt ID as a pointer
+	// Create grocery items
+	for _, itemData := range receiptData.Items {
+		expiryDate, err := time.Parse(time.RFC3339, itemData.ExpiryDate)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid expiry date format"})
+			return
+		}
+
+		item := models.GroceryItem{
+			UserID:          userID.(uint),
+			ReceiptID:       &receipt.ID,
+			Name:            itemData.Name,
+			Quantity:        itemData.Quantity,
+			Unit:            itemData.Unit,
+			ExpiryDate:      expiryDate,
+			StorageLocation: itemData.StorageLocation,
+		}
+
 		if err := database.DB.Create(&item).Error; err != nil {
-			continue // Skip items that fail to save
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create grocery item"})
+			return
 		}
 	}
 
 	c.JSON(http.StatusCreated, gin.H{
+		"message": "Receipt and items saved successfully",
 		"receipt": receipt,
-		"items":   items,
 	})
 }
 

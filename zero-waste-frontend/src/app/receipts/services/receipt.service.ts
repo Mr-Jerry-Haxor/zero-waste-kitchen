@@ -36,16 +36,13 @@ export class ReceiptService {
     );
   }
 
-  uploadReceipt(file: File): Observable<Receipt> {
-    const formData = new FormData();
-    formData.append('file', file);
-
-    return this.http.post<Receipt>(`${this.apiUrl}/upload`, formData).pipe(
-      catchError(err => {
-        this.showError('Upload failed');
-        return throwError(() => err);
-      })
-    );
+  uploadReceipt(formData: FormData): Observable<any> {
+      return this.http.post(`${this.apiUrl}/upload`, formData).pipe(
+          catchError(error => {
+              this.snackBar.open('Upload failed', 'Close', { duration: 3000 });
+              return throwError(() => error);
+          })
+      );
   }
 
   processReceipt(file: File): Observable<OcrResult> {

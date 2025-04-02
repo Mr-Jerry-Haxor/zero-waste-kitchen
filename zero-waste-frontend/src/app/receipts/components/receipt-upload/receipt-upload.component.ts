@@ -58,6 +58,8 @@ export class ReceiptUploadComponent {
     }
   }
 
+  
+
   async processReceipt(): Promise<void> {
     if (!this.selectedFile) return;
 
