@@ -1,0 +1,90 @@
+<!-- ocr-preview-dialog.component.html -->
+<div class="ocr-dialog-container">
+    <h2 mat-dialog-title>Review Receipt Details</h2>
+    
+    <mat-dialog-content>
+    <div class="ocr-meta">
+        <span class="confidence" [style.color]="getConfidenceColor()">
+        OCR Confidence: {{ confidence | number:'1.0-0' }}%
+        </span>
+        <button mat-button (click)="showRawText = !showRawText">
+        {{ showRawText ? 'Hide Raw Text' : 'Show Raw Text' }}
+        </button>
+    </div>
+
+    <div *ngIf="showRawText" class="raw-text">
+        <pre>{{ data.ocrResult.rawText }}</pre>
+    </div>
+      <div class="preview-container">
+        <div class="image-preview">
+          <img [src]="data.image" alt="Receipt preview" class="receipt-image">
+        </div>
+        
+        <div class="details-preview">
+          <mat-card>
+            <mat-card-header>
+              <mat-card-title>Extracted Information</mat-card-title>
+            </mat-card-header>
+            
+            <mat-card-content>
+              <div class="form-field">
+                <mat-form-field appearance="outline">
+                  <mat-label>Store Name</mat-label>
+                  <input matInput [(ngModel)]="data.ocrResult.storeName">
+                </mat-form-field>
+              </div>
+              
+              <div class="form-field">
+                <mat-form-field appearance="outline">
+                  <mat-label>Purchase Date</mat-label>
+                  <input matInput type="date" [(ngModel)]="data.ocrResult.purchaseDate">
+                </mat-form-field>
+              </div>
+              
+              <div class="form-field">
+                <mat-form-field appearance="outline">
+                  <mat-label>Total Amount</mat-label>
+                  <input matInput type="number" [(ngModel)]="data.ocrResult.totalAmount">
+                </mat-form-field>
+              </div>
+              
+              <h3>Items</h3>
+              <mat-list>
+                <mat-list-item *ngFor="let item of editedItems; trackBy: trackByIndex" class="item-row">
+                  <div class="item-controls">
+                    <mat-form-field appearance="outline" class="item-name">
+                      <mat-label>Name</mat-label>
+                      <input matInput [(ngModel)]="item.name">
+                    </mat-form-field>
+                    
+                    <mat-form-field appearance="outline" class="item-quantity">
+                      <mat-label>Quantity</mat-label>
+                      <input matInput type="number" [(ngModel)]="item.quantity">
+                    </mat-form-field>
+                    
+                    <mat-form-field appearance="outline" class="item-unit">
+                      <mat-label>Unit</mat-label>
+                      <input matInput [(ngModel)]="item.unit">
+                    </mat-form-field>
+                    
+                    <button mat-icon-button color="warn" (click)="removeItem(i)" *ngFor="let item of editedItems; let i = index">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </mat-list-item>
+              </mat-list>
+              
+              <button mat-button color="primary" (click)="addItem()">
+                <mat-icon>add</mat-icon> Add Item
+              </button>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
+    </mat-dialog-content>
+    
+    <mat-dialog-actions align="end">
+      <button mat-button (click)="onCancel()">Cancel</button>
+      <button mat-raised-button color="primary" (click)="onSave()">Save and Upload</button>
+    </mat-dialog-actions>
+  </div>

@@ -1,75 +1,81 @@
+/* receipt-detail.component.css */
 .receipt-detail-container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  gap: 16px;
+}
+
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #f44336;
+  padding: 16px;
+  background-color: rgba(244, 67, 54, 0.1);
+  border-radius: 4px;
+  margin: 16px 0;
+}
+
+.receipt-content {
+  margin-top: 16px;
+}
+
+.receipt-image {
+  width: 100%;
+  max-height: 500px;
+  object-fit: contain;
+  margin: 16px 0;
+  border-radius: 4px;
+}
+
+.item-row {
+  height: auto !important;
+  padding: 8px 0;
+}
+
+.item-details {
+  flex: 1;
+  display: flex;
+  gap: 16px;
+}
+
+.item-name {
+  flex: 2;
+}
+
+.item-quantity {
+  flex: 1;
+  color: #666;
+}
+
+.item-price {
+  font-weight: 500;
+}
+
+.total-amount {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 16px;
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+@media (max-width: 600px) {
+  .receipt-detail-container {
+    padding: 16px;
   }
   
-  .receipt-header {
-    margin-bottom: 2rem;
+  .item-details {
+    flex-direction: column;
+    gap: 4px;
   }
-  
-  .receipt-meta {
-    display: flex;
-    gap: 1rem;
-    color: #666;
-    margin-top: 0.5rem;
-  }
-  
-  .receipt-image {
-    margin: 2rem 0;
-    border: 1px solid #eee;
-    padding: 1rem;
-    background: white;
-    box-shadow: var(--shadow);
-  }
-  
-  .receipt-image img {
-    width: 100%;
-    height: auto;
-    max-height: 500px;
-    object-fit: contain;
-  }
-  
-  .items-list {
-    margin-top: 2rem;
-  }
-  
-  .item-row {
-    display: flex;
-    justify-content: space-between;
-    padding: 1rem;
-    border-bottom: 1px solid #eee;
-  }
-  
-  .item-name {
-    flex: 2;
-  }
-  
-  .item-quantity {
-    flex: 1;
-    text-align: right;
-    padding-right: 1rem;
-  }
-  
-  .item-price {
-    flex: 1;
-    text-align: right;
-    font-weight: bold;
-  }
-  
-  @media (max-width: 600px) {
-    .receipt-meta {
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-    
-    .item-row {
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-    
-    .item-quantity, .item-price {
-      text-align: left;
-      padding-right: 0;
-    }
-  }
+}

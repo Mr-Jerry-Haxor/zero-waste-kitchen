@@ -1,25 +1,55 @@
+<!-- receipt-detail.component.html -->
 <div class="receipt-detail-container">
-    <button mat-button (click)="router.navigate(['/receipts'])">← Back to Receipts</button>
-    
-    <div *ngIf="loading" class="loading">Loading receipt...</div>
-    
-    <div *ngIf="error" class="error-message">{{ error }}</div>
-    
-    <div *ngIf="receipt && !loading" class="receipt-detail">
-      <div *ngIf="receipt">
-        <span>{{ receipt.createdAt | date }}</span>
-      </div>
-      
-      <div class="receipt-image" *ngIf="receipt.imagePath">
-        <img [src]="receipt.imagePath" alt="Receipt image">
-      </div>
-      
-      <div class="items-list">
-        <h2>Items</h2>
-        <div *ngFor="let item of receipt.items" class="item-row">
-          <span class="item-name">{{ item.name }}</span>
-          <span class="item-quantity">{{ item.quantity }} {{ item.unit }}</span>
-        </div>
-      </div>
-    </div>
+  <button mat-button (click)="router.navigate(['/receipts'])">
+    <mat-icon>arrow_back</mat-icon> Back to Receipts
+  </button>
+
+  <div *ngIf="loading" class="loading-spinner">
+    <mat-spinner></mat-spinner>
+    <p>Loading receipt details...</p>
   </div>
+
+  <div *ngIf="error" class="error-message">
+    <mat-icon color="warn">error</mat-icon>
+    <p>{{ error }}</p>
+  </div>
+
+  <div *ngIf="receipt && !loading" class="receipt-content">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>{{ receipt.storeName || 'Unknown Store' }}</mat-card-title>
+        <mat-card-subtitle>
+          {{ receipt.purchaseDate | date:'fullDate' }}
+        </mat-card-subtitle>
+      </mat-card-header>
+
+      <img 
+        *ngIf="receipt.imagePath" 
+        [src]="receipt.imagePath" 
+        alt="Receipt image"
+        class="receipt-image">
+
+      <mat-card-content>
+        <h3>Items</h3>
+        <mat-list>
+          <mat-list-item *ngFor="let item of receipt.items" class="item-row">
+            <div class="item-details">
+              <span class="item-name">{{ item.name }}</span>
+              <span class="item-quantity">{{ item.quantity }} {{ item.unit }}</span>
+            </div>
+            <span *ngIf="item.price" class="item-price">
+              {{ getTotalPrice(item) | currency }}
+            </span>
+          </mat-list-item>
+        </mat-list>
+
+        <mat-divider></mat-divider>
+
+        <div *ngIf="receipt.totalAmount" class="total-amount">
+          <span>Total:</span>
+          <span>{{ receipt.totalAmount | currency }}</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

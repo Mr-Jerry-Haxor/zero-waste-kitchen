@@ -6,4 +6,18 @@ export interface Receipt {
     userId: string;
     items: GroceryItem[];
     createdAt: Date;
+    storeName?: string;
+    purchaseDate?: Date;
+    totalAmount?: number;
+}
+
+
+
+export interface OcrResult {
+  storeName: string;
+  purchaseDate: Date;
+  totalAmount: number;
+  items: GroceryItem[];
+  rawText: string;
+  confidence: number;
 }

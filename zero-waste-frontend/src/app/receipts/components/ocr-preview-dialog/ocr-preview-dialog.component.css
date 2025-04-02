@@ -1,0 +1,103 @@
+/* ocr-preview-dialog.component.css */
+.ocr-dialog-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  
+  .preview-container {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    height: 70vh;
+  }
+  
+  .image-preview {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+  }
+  
+  .receipt-image {
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+  }
+  
+  .details-preview {
+    flex: 1;
+    overflow-y: auto;
+  }
+  
+  .form-field {
+    margin-bottom: 1rem;
+  }
+  
+  .item-row {
+    height: auto !important;
+    margin-bottom: 0.5rem;
+    padding: 0.5rem 0;
+  }
+  
+  .item-controls {
+    display: flex;
+    gap: 0.5rem;
+    width: 100%;
+    align-items: center;
+  }
+  
+  .item-name {
+    flex: 3;
+  }
+  
+  .item-quantity {
+    flex: 1;
+    min-width: 80px;
+  }
+  
+  .item-unit {
+    flex: 1;
+    min-width: 80px;
+  }
+  
+  @media (max-width: 960px) {
+    .preview-container {
+      flex-direction: column;
+      height: auto;
+    }
+    
+    .image-preview {
+      max-height: 300px;
+    }
+  }
+
+
+/* ocr-preview-dialog.component.css */
+.ocr-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    background: #f5f5f5;
+    border-radius: 4px;
+  }
+  
+  .confidence {
+    font-weight: 500;
+  }
+  
+  .raw-text {
+    max-height: 200px;
+    overflow: auto;
+    background: #fafafa;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+    border: 1px solid #eee;
+    font-family: monospace;
+    white-space: pre-wrap;
+  }

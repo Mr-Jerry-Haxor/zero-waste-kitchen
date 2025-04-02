@@ -1,8 +1,11 @@
+// receipt.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, catchError, map, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Receipt } from '../models/receipt';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { OcrResult } from '../models/receipt';
 
 @Injectable({
   providedIn: 'root'
@@ -10,24 +13,66 @@ import { Receipt } from '../models/receipt';
 export class ReceiptService {
   private apiUrl = `${environment.apiUrl}/receipts`;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private snackBar: MatSnackBar
+  ) {}
 
   getAllReceipts(): Observable<Receipt[]> {
-    return this.http.get<Receipt[]>(this.apiUrl);
+    return this.http.get<Receipt[]>(this.apiUrl).pipe(
+      catchError(err => {
+        this.showError('Failed to load receipts');
+        return throwError(() => err);
+      })
+    );
   }
 
   getReceipt(id: string): Observable<Receipt> {
-    return this.http.get<Receipt>(`${this.apiUrl}/${id}`);
+    return this.http.get<Receipt>(`${this.apiUrl}/${id}`).pipe(
+      catchError(err => {
+        this.showError('Failed to load receipt details');
+        return throwError(() => err);
+      })
+    );
   }
 
   uploadReceipt(file: File): Observable<Receipt> {
     const formData = new FormData();
     formData.append('file', file);
 
-    return this.http.post<Receipt>(`${this.apiUrl}/upload`, formData);
+    return this.http.post<Receipt>(`${this.apiUrl}/upload`, formData).pipe(
+      catchError(err => {
+        this.showError('Upload failed');
+        return throwError(() => err);
+      })
+    );
+  }
+
+  processReceipt(file: File): Observable<OcrResult> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    return this.http.post<OcrResult>(`${this.apiUrl}/process`, formData).pipe(
+      catchError(err => {
+        this.showError('OCR processing failed');
+        return throwError(() => err);
+      })
+    );
   }
 
   deleteReceipt(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+    return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
+      catchError(err => {
+        this.showError('Failed to delete receipt');
+        return throwError(() => err);
+      })
+    );
+  }
+
+  showError(message: string): void {
+    this.snackBar.open(message, 'Close', {
+      duration: 5000,
+      panelClass: ['error-snackbar']
+    });
   }
 }
