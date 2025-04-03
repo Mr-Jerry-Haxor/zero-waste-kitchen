@@ -38,5 +38,25 @@ CREATE TABLE grocery_items (
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+
+-- Create recipes table
+CREATE TABLE recipes (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    title VARCHAR(255) NOT NULL,
+    ingredients TEXT NOT NULL, -- Each ingredient on a new line
+    instructions TEXT NOT NULL, -- Step-by-step instructions
+    prep_time INTEGER NOT NULL, -- In minutes
+    cook_time INTEGER NOT NULL, -- In minutes
+    servings INTEGER NOT NULL,
+    difficulty VARCHAR(50) NOT NULL, -- Easy, Medium, or Hard
+    cuisine VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create indexes for recipes table
+CREATE INDEX idx_recipes_user_id ON recipes(user_id);
+
 -- Create indexes
 CREATE INDEX idx_grocery_items_user_expiry ON grocery_items(user_id, expiry_date);

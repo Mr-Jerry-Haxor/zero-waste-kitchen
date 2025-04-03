@@ -24,9 +24,14 @@ export const routes: Routes = [
     canActivate: [AuthGuard]
   },
   {
+    path: 'recipes',
+    loadChildren: () => import('./recipes/recipes.module').then(m => m.RecipesModule),
+    canActivate: [AuthGuard]
+  },
+  {
     path: 'admin',
     loadChildren: () => import('./admin/admin.module').then(m => m.AdminModule),
-    canActivateChild: [AuthGuard] // Protect admin routes
+    canActivate: [AuthGuard]
   },
   {
     path: '**',

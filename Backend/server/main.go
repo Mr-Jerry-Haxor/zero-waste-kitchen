@@ -11,12 +11,12 @@ import (
 	"zero-waste-kitchen/internal/config"
 	"zero-waste-kitchen/internal/controllers"
 	"zero-waste-kitchen/internal/models"
+	"zero-waste-kitchen/internal/repositories"
 	"zero-waste-kitchen/internal/services"
 	"zero-waste-kitchen/pkg/database"
 	"zero-waste-kitchen/pkg/middleware"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gofiber/fiber"
 )
 
 func main() {
@@ -28,10 +28,23 @@ func main() {
 	database.AutoMigrate()
 	defer database.CloseDB()
 
+	// Assign initialized database instance to db
+	db := database.DB
+
 	// Initialize Firebase
 	if err := services.InitializeFirebase(); err != nil {
 		log.Fatalf("Failed to initialize Firebase: %v", err)
 	}
+
+	// Initialize services
+	groceryRepo := repositories.NewGroceryRepository(db)
+	recipeRepo := repositories.NewRecipeRepository(db)
+	recipeService := services.NewRecipeService(
+		groceryRepo,
+		recipeRepo,
+		os.Getenv("GROQ_API_KEY"),
+	)
+	recipeController := controllers.NewRecipeController(recipeService)
 
 	// Set Gin mode based on environment
 	if config.AppConfig.ServerPort == "8080" {
@@ -49,7 +62,7 @@ func main() {
 	)
 
 	// Register routes
-	registerRoutes(router)
+	registerRoutes(router, recipeController)
 
 	// Create HTTP server with graceful shutdown
 	server := &http.Server{
@@ -90,7 +103,7 @@ func main() {
 	log.Println("Server exited properly")
 }
 
-func registerRoutes(router *gin.Engine) {
+func registerRoutes(router *gin.Engine, recipeController *controllers.RecipeController) {
 	api := router.Group("/api")
 	{
 		// Health check endpoint
@@ -107,16 +120,17 @@ func registerRoutes(router *gin.Engine) {
 		{
 			auth.POST("/register", controllers.Register)
 			auth.POST("/login", controllers.Login)
-			auth.GET("/isadmin", middleware.JWTAuthMiddleware(), controllers.CheckAdminStatus) // New endpoint
+			auth.GET("/isadmin", middleware.JWTAuthMiddleware(), controllers.CheckAdminStatus)
 		}
 
 		// Admin routes
 		adminRoutes := api.Group("/admin")
-		adminRoutes.Use(middleware.JWTAuthMiddleware(), middleware.RequireAdmin()) // Middleware to check if user is admin
+		adminRoutes.Use(middleware.JWTAuthMiddleware(), middleware.RequireAdmin())
 		{
 			adminRoutes.GET("/users", controllers.GetUsersList)
 			adminRoutes.POST("/send-notification", controllers.SendNotification)
 		}
+
 		// Protected routes
 		protected := api.Group("")
 		protected.Use(middleware.JWTAuthMiddleware())
@@ -146,6 +160,14 @@ func registerRoutes(router *gin.Engine) {
 				user.GET("", controllers.GetCurrentUser)
 				user.PUT("", controllers.UpdateUser)
 				user.POST("/fcm-token", controllers.RegisterFCMToken)
+			}
+
+			// Recipe routes (new)
+			recipe := protected.Group("/recipes")
+			{
+				recipe.GET("", recipeController.GetAllRecipes)
+				recipe.GET("/:id", recipeController.GetRecipeByID)
+				recipe.POST("/generate", recipeController.GenerateRecipes)
 			}
 		}
 	}
@@ -207,27 +229,4 @@ func checkAndNotifyItems(threshold time.Duration) {
 			services.SendExpiryNotification(user, expiringItems)
 		}
 	}
-}
-
-func registerFCMToken(c *fiber.Ctx) error {
-	var payload struct {
-		Token string `json:"token"`
-	}
-
-	if err := c.BodyParser(&payload); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid request payload",
-		})
-	}
-
-	userID := c.Locals("userID").(uint) // Assuming userID is set in middleware
-	if err := database.DB.Model(&models.User{}).Where("id = ?", userID).Update("fcm_token", payload.Token).Error; err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Failed to update FCM token",
-		})
-	}
-
-	return c.JSON(fiber.Map{
-		"message": "FCM token registered successfully",
-	})
 }

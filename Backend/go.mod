@@ -10,21 +10,11 @@ require (
 	github.com/go-playground/validator/v10 v10.15.4
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/joho/godotenv v1.5.1
+	github.com/jpoz/groq v0.0.0-20240513145022-7a02894105a0
 	golang.org/x/crypto v0.12.0
 	google.golang.org/api v0.138.0
 	gorm.io/driver/postgres v1.5.2
 	gorm.io/gorm v1.25.4
-)
-
-require (
-	github.com/andybalholm/brotli v1.0.0 // indirect
-	github.com/gofiber/utils v0.0.10 // indirect
-	github.com/gorilla/schema v1.1.0 // indirect
-	github.com/klauspost/compress v1.10.7 // indirect
-	github.com/mattn/go-colorable v0.1.7 // indirect
-	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	github.com/valyala/fasthttp v1.16.0 // indirect
-	github.com/valyala/tcplisten v0.0.0-20161114210144-ceec8f93295a // indirect
 )
 
 require (
@@ -44,7 +34,6 @@ require (
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
-	github.com/gofiber/fiber v1.14.6
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect

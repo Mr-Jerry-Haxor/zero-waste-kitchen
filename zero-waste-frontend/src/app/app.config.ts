@@ -9,6 +9,7 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatChipsModule } from '@angular/material/chips';
+import { MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/material/snack-bar';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -34,9 +35,20 @@ export const appConfig: ApplicationConfig = {
     // Animations support
     provideAnimations(),
     provideAnimationsAsync(),
+    
+    // Material modules
     MatNativeDateModule,
     MatDatepickerModule,
     MatChipsModule,
     
+    // Global snackbar configuration
+    {
+      provide: MAT_SNACK_BAR_DEFAULT_OPTIONS,
+      useValue: {
+        duration: 3000,
+        horizontalPosition: 'right',
+        verticalPosition: 'top'
+      }
+    }
   ]
 };
