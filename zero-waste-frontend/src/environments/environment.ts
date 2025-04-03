@@ -1,6 +1,6 @@
 export const environment = {
-    production: false,
-    apiUrl: 'http://localhost:8888/api',
+    production: true,
+    apiUrl: 'https://zero-waste.devhost.my/api',
     firebase: {
       apiKey: "AIzaSyC60x-l8q4674Hb31HQ2AhTHiYHBzpeJ14",
       authDomain: "zero-kitchen-waste.firebaseapp.com",
