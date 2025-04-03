@@ -37,9 +37,9 @@
       [routerLink]="['/receipts', receipt.id]">
       
       <mat-card-header>
-        <mat-card-title>{{ receipt.storeName || 'Unknown Store' }}</mat-card-title>
+        <mat-card-title>{{ receipt.store_name || 'Unknown Store' }}</mat-card-title>
         <mat-card-subtitle>
-          {{ receipt.purchaseDate | date:'mediumDate' }}
+          {{ receipt.purchase_date | date:'mediumDate' }}
         </mat-card-subtitle>
       </mat-card-header>
       
@@ -49,9 +49,9 @@
             <mat-icon>shopping_basket</mat-icon>
             {{ getTotalItems(receipt) }} items
           </span>
-          <span *ngIf="receipt.totalAmount" class="meta-item">
+          <span *ngIf="receipt.total_amount" class="meta-item">
             <mat-icon>attach_money</mat-icon>
-            {{ receipt.totalAmount | currency }}
+            {{ receipt.total_amount | currency }}
           </span>
         </div>
       </mat-card-content>

@@ -6,9 +6,9 @@ export interface Receipt {
     userId: string;
     items: GroceryItem[];
     createdAt: Date;
-    storeName?: string;
-    purchaseDate?: Date;
-    totalAmount?: number;
+    store_name?: string;
+    purchase_date?: Date;
+    total_amount?: number;
 }
 
 

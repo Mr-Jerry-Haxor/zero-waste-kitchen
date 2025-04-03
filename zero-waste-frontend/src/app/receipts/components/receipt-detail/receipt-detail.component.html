@@ -17,9 +17,9 @@
   <div *ngIf="receipt && !loading" class="receipt-content">
     <mat-card>
       <mat-card-header>
-        <mat-card-title>{{ receipt.storeName || 'Unknown Store' }}</mat-card-title>
+        <mat-card-title>{{ receipt.store_name || 'Unknown Store' }}</mat-card-title>
         <mat-card-subtitle>
-          {{ receipt.purchaseDate | date:'fullDate' }}
+          {{ receipt.purchase_date | date:'fullDate' }}
         </mat-card-subtitle>
       </mat-card-header>
 
@@ -45,9 +45,9 @@
 
         <mat-divider></mat-divider>
 
-        <div *ngIf="receipt.totalAmount" class="total-amount">
+        <div *ngIf="receipt.total_amount" class="total-amount">
           <span>Total:</span>
-          <span>{{ receipt.totalAmount | currency }}</span>
+          <span>{{ receipt.total_amount | currency }}</span>
         </div>
       </mat-card-content>
     </mat-card>

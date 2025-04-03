@@ -104,15 +104,26 @@ export class GroceryListComponent implements OnInit {
     
     // Apply expiry filter
     if (this.expiryFilter) {
-      const days = parseInt(this.expiryFilter);
-      filtered = filtered.filter(grocery => {
-        if (!grocery.expiry_date) return false;
-        const expiryDate = new Date(grocery.expiry_date);
-        const today = new Date();
-        const diffTime = expiryDate.getTime() - today.getTime();
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        return diffDays <= days && diffDays >= 0;
-      });
+      if (this.expiryFilter === 'expired') {
+        // Show only expired items
+        filtered = filtered.filter(grocery => {
+          if (!grocery.expiry_date) return false;
+          const expiryDate = new Date(grocery.expiry_date);
+          const today = new Date();
+          return expiryDate < today; // Expired items
+        });
+      } else {
+        // Show items expiring within the selected number of days
+        const days = parseInt(this.expiryFilter, 10);
+        filtered = filtered.filter(grocery => {
+          if (!grocery.expiry_date) return false;
+          const expiryDate = new Date(grocery.expiry_date);
+          const today = new Date();
+          const diffTime = expiryDate.getTime() - today.getTime();
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          return diffDays <= days && diffDays >= 0;
+        });
+      }
     }
     
     // Apply storage location filter
